@@ -5,10 +5,27 @@ table.table-fields.control-label.col-lg-0 {
     display: none;
 }
 
-table.table-fields td {
-    border: 1px solid #f4f4f4
+table.table-fields tbody tr td {
+    border: none;
 }
 
-table.table-fields td .form-group {
+table.table-fields tbody tr td:first {
+    padding-left: 0;
+}
+
+table.table-fields tbody tr td:first {
+    padding-right: 0;
+}
+
+table.table-fields tbody td .form-group {
     margin-bottom: 0;
+}
+
+.table.table-fields {
+    margin-bottom: 0;
+}
+
+table.table-fields .form-group.has-error .control-label,
+table.table-fields .form-group.has-error br {
+    display: none;
 }

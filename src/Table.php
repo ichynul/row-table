@@ -8,6 +8,7 @@ use Encore\Admin\Form\Field\Html;
 use Encore\Admin\Widgets\Table as TableView;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Validator;
 
 class Table extends Html
 {
@@ -29,6 +30,13 @@ class Table extends Html
     protected $form = null;
 
     /**
+     * @var TableRow
+     */
+    protected $errorRow = null;
+
+    protected $display = null;
+
+    /**
      * class attr
      *
      * @var string
@@ -43,7 +51,7 @@ class Table extends Html
     public function __construct($form, $label)
     {
         $this->form = $form;
-        $this->tableWidget = new TableView(['Empty table'], []);
+        $this->tableWidget = new TableView([], []);
         $this->tableWidget->class($this->defaultClass);
         parent::__construct('', $label);
     }
@@ -74,7 +82,27 @@ class Table extends Html
             throw new \Exception('Rows format error!');
         }
         $this->rows = $rows;
+        $this->addErrorRow();
+        $formatId = '';
+        foreach ($this->rows as $row) {
+            foreach ($row->geFields() as $field) {
+                $formatId .= $this->formatId($field->column());
+            }
+        }
+        if (strlen($formatId) > 10) {
+            $formatId = substr($formatId, 10);
+        }
+        $this->setErrorKey($formatId);
+        \Log::info($formatId);
         return $this;
+    }
+
+    protected function addErrorRow()
+    {
+        $errorRow = new TableRow();
+        $this->text = $errorRow->text('__table_error__', 'error');
+        //$this->text->setForm($this->form);
+        $this->rows[] = $errorRow;
     }
 
     /**
@@ -132,19 +160,17 @@ class Table extends Html
     }
 
     /**
-     * Set original value to the field.
+     * Prepare for a field value before update or insert.
      *
-     * @param array $data
+     * @param $data
      *
-     * @return void
+     * @return mixed
      */
-    public function setOriginal($data)
+    public function prepare($data)
     {
-        $data = Input::all();
-        $rows = $this->rows;
         $fields = [];
-        $this->form->saving(function (Form $form) use ($rows, $data) {
-            foreach ($rows as &$row) {
+        $this->form->saving(function (Form $form) use ($data) {
+            foreach ($this->rows as &$row) {
                 $fields = $row->geFields();
                 foreach ($fields as $field) {
                     $field->setOriginal($data);
@@ -155,53 +181,57 @@ class Table extends Html
                 \Log::info('error');
                 return back()->withInput()->withErrors($validationMessages);
                 $error = new MessageBag([
-                    'title'   => 'xxxx',
+                    'title' => 'xxxx',
                     'message' => '0000',
                 ]);
                 return back()->with(compact('error'));
             }
             $error = new MessageBag([
-                'title'   => 'title...',
+                'title' => 'title...',
                 'message' => 'message....',
             ]);
-        
+
             return back()->with(compact('error'));
         });
     }
 
-    public function validationMessages($input)
+    /**
+     * Get validator for this field.
+     *
+     * @param array $input
+     *
+     * @return bool|Validator
+     */
+    public function getValidator(array $input)
     {
-        $failedValidators = [];
-        \Log::info($input);
+        if ($this->validator) {
+            return $this->validator->call($this, $input);
+        }
         foreach ($this->rows as $row) {
-            $columns = [];
             foreach ($row->geFields() as $field) {
                 if (!$validator = $field->getValidator($input)) {
                     continue;
                 }
                 if (($validator instanceof Validator) && !$validator->passes()) {
-                    $failedValidators[] = $validator;
+                    $this->errorValidator = $validator;
+                    $err = $validator->errors()->first($field->getErrorKey());
+                    \Log::debug('$getmessages:' . $err);
+                    Validator::make($input, [
+                        'comment' => ['required', 'string'],
+                        'rating' => ['required', 'integer', 'min:1', 'max:5'],
+                    ], [
+                        'comment.required' => '请输入评价内容',
+                        'rating.required' => '请选择评分',
+                        'rating.min' => '评分不能小于1',
+                        'rating.max' => '评分不能大于5',
+                    ]);
+                    //return Validator::make($input, $rules, $this->validationMessages, $attributes);
+                    //$this->errorRow->setErrorKey($field->getErrorKey());
+                    return $this->errorValidator;
                 }
             }
         }
-        $message = $this->mergeValidationMessages($failedValidators);
-        return $message->any() ? $message : false;
-    }
-
-    /**
-     * Merge validation messages from input validators.
-     *
-     * @param \Illuminate\Validation\Validator[] $validators
-     *
-     * @return MessageBag
-     */
-    protected function mergeValidationMessages($validators)
-    {
-        $messageBag = new MessageBag();
-        foreach ($validators as $validator) {
-            $messageBag = $messageBag->merge($validator->messages());
-        }
-        return $messageBag;
+        return false;
     }
 
     /**
