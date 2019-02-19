@@ -83,7 +83,7 @@ class Table extends Field
             \Log::info('submitted');
             foreach ($this->rows as $row) {
                 foreach ($row->geFields() as $field) {
-                   // $this->form->builder()->fields()->push($field);
+                    $this->form->builder()->fields()->push($field);
                 }
             }
         });
