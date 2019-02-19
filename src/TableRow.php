@@ -5,10 +5,10 @@ namespace Ichynul\RowTable;
 use Encore\Admin\Extension;
 use Encore\Admin\Form;
 use Encore\Admin\Form\Field;
+use Encore\Admin\Form\Field\Html;
 
 class TableRow
 {
-
     /**
      * @var array
      */
@@ -49,7 +49,7 @@ class TableRow
 
             $element = new $className($column, array_slice($arguments, 1));
 
-            $element->setWidth(12, 0);
+            $element->setWidth(10, 2);
 
             $this->pushField($element);
 

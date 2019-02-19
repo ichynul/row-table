@@ -17,6 +17,10 @@ class RowTableServiceProvider extends ServiceProvider
             return;
         }
 
+        if ($views = $extension->views()) {
+            $this->loadViewsFrom($views, $extension->name);
+        }
+
         if ($this->app->runningInConsole() && $assets = $extension->assets()) {
             $this->publishes(
                 [$assets => public_path('vendor/laravel-admin-ext/row-table')],

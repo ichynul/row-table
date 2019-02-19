@@ -4,13 +4,13 @@ namespace Ichynul\RowTable;
 
 use Encore\Admin\Form;
 use Encore\Admin\Form\Field;
-use Encore\Admin\Form\Field\Html;
-use Encore\Admin\Widgets\Table as TableView;
+use Encore\Admin\Form\Field\MultipleSelect;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\MessageBag;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Validator as ValidatorTool;
+use Illuminate\Validation\Validator;
 
-class Table extends Html
+class Table extends Field
 {
     /**
      * @var array
@@ -20,21 +20,19 @@ class Table extends Html
     ];
 
     /**
-     * @var TableView
+     * @var TableWidget
      */
     protected $tableWidget = null;
+
+    /**
+     * @var string
+     */
+    protected $view = 'row-table::table';
 
     /**
      * @var Form
      */
     protected $form = null;
-
-    /**
-     * @var TableRow
-     */
-    protected $errorRow = null;
-
-    protected $display = null;
 
     /**
      * class attr
@@ -48,12 +46,73 @@ class Table extends Html
      */
     protected $rows = [];
 
+    /**
+     * @var array
+     */
+    protected $allRules = [];
+    /**
+     * @var array
+     */
+    protected $messages = [];
+    /**
+     * @var array
+     */
+    protected $labels = [];
+    /**
+     * @var array
+     */
+    protected $input = [];
+
     public function __construct($form, $label)
     {
         $this->form = $form;
-        $this->tableWidget = new TableView([], []);
+        $this->tableWidget = new TableWidget([], []);
         $this->tableWidget->class($this->defaultClass);
+        $this->callSubmitted();
         parent::__construct('', $label);
+    }
+
+    /**
+     * Call submitted callback.
+     *
+     * @return mixed
+     */
+    protected function callSubmitted()
+    {
+        $this->form->submitted(function (Form $form) {
+            \Log::info('submitted');
+            foreach ($this->rows as $row) {
+                foreach ($row->geFields() as $field) {
+                   // $this->form->builder()->fields()->push($field);
+                }
+            }
+        });
+    }
+
+    /**
+     * Set useDiv
+     *
+     * @param boolean $useDiv
+     *
+     * @return $this
+     */
+    public function useDiv($div)
+    {
+        $this->tableWidget->useDiv($div);
+        return $this;
+    }
+
+    /**
+     * Set table whether th headers.
+     *
+     * @param boolean $th
+     *
+     * @return $this
+     */
+    public function headersTh($th = true)
+    {
+        $this->tableWidget->headersTh($th);
+        return $this;
     }
 
     /**
@@ -78,31 +137,23 @@ class Table extends Html
      */
     public function setRows($rows = [])
     {
-        if (!is_array($rows)) {
+        if (!is_array($rows) && !$rows instanceof TableRow) {
             throw new \Exception('Rows format error!');
         }
-        $this->rows = $rows;
-        $this->addErrorRow();
+
+        $this->rows = $rows instanceof TableRow ? [$rows] : $rows;
         $formatId = '';
         foreach ($this->rows as $row) {
             foreach ($row->geFields() as $field) {
                 $formatId .= $this->formatId($field->column());
             }
         }
-        if (strlen($formatId) > 10) {
-            $formatId = substr($formatId, 10);
+        if (strlen($formatId) > 20) {
+            $formatId = substr($formatId, 20);
         }
         $this->setErrorKey($formatId);
-        \Log::info($formatId);
+        $this->id = $formatId;
         return $this;
-    }
-
-    protected function addErrorRow()
-    {
-        $errorRow = new TableRow();
-        $this->text = $errorRow->text('__table_error__', 'error');
-        //$this->text->setForm($this->form);
-        $this->rows[] = $errorRow;
     }
 
     /**
@@ -134,7 +185,7 @@ class Table extends Html
     /**
      * get inner tableWidget
      *
-     * @return TableView
+     * @return TableWidget
      */
     public function getTableWidget()
     {
@@ -149,50 +200,19 @@ class Table extends Html
             $columns = [];
             foreach ($row->geFields() as $field) {
                 if (!$field instanceof Field) {
+                    $tableRows[] = $field;
                     throw new \Exception('Column format error! Column must be a instanceof Encore\Admin\Form\Field');
                 }
                 $field->fill($data);
+                if (!$this->tableWidget->usingDiv()) {
+                    $field->setWidth(12, 0);
+                    $field->attribute(['title' => $field->column()]);
+                }
                 $columns[] = $field->render();
             }
             $tableRows[] = $columns;
         }
         $this->tableWidget->setRows($tableRows);
-    }
-
-    /**
-     * Prepare for a field value before update or insert.
-     *
-     * @param $data
-     *
-     * @return mixed
-     */
-    public function prepare($data)
-    {
-        $fields = [];
-        $this->form->saving(function (Form $form) use ($data) {
-            foreach ($this->rows as &$row) {
-                $fields = $row->geFields();
-                foreach ($fields as $field) {
-                    $field->setOriginal($data);
-                }
-            }
-
-            if ($validationMessages = $this->validationMessages($data)) {
-                \Log::info('error');
-                return back()->withInput()->withErrors($validationMessages);
-                $error = new MessageBag([
-                    'title' => 'xxxx',
-                    'message' => '0000',
-                ]);
-                return back()->with(compact('error'));
-            }
-            $error = new MessageBag([
-                'title' => 'title...',
-                'message' => 'message....',
-            ]);
-
-            return back()->with(compact('error'));
-        });
     }
 
     /**
@@ -207,31 +227,72 @@ class Table extends Html
         if ($this->validator) {
             return $this->validator->call($this, $input);
         }
+        $this->input = $input;
+        $this->allRules = [];
+        $this->messages = [];
+        $this->labels = [];
+
         foreach ($this->rows as $row) {
             foreach ($row->geFields() as $field) {
-                if (!$validator = $field->getValidator($input)) {
+                if (!$validator = $field->getValidator($this->input)) {
                     continue;
                 }
                 if (($validator instanceof Validator) && !$validator->passes()) {
-                    $this->errorValidator = $validator;
-                    $err = $validator->errors()->first($field->getErrorKey());
-                    \Log::debug('$getmessages:' . $err);
-                    Validator::make($input, [
-                        'comment' => ['required', 'string'],
-                        'rating' => ['required', 'integer', 'min:1', 'max:5'],
-                    ], [
-                        'comment.required' => '请输入评价内容',
-                        'rating.required' => '请选择评分',
-                        'rating.min' => '评分不能小于1',
-                        'rating.max' => '评分不能大于5',
-                    ]);
-                    //return Validator::make($input, $rules, $this->validationMessages, $attributes);
-                    //$this->errorRow->setErrorKey($field->getErrorKey());
-                    return $this->errorValidator;
+                    $this->makeValidator($field, $validator);
                 }
             }
         }
+        if (empty($this->allRules)) {
+            return false;
+        }
+        $this->allRules[$this->getErrorKey()] = ['required'];
+        $this->messages[$this->getErrorKey() . '.required'] = implode(' ', array_values($this->messages));
+        $this->labels[$this->getErrorKey()] = $this->label();
+
+        return ValidatorTool::make($this->input, $this->allRules, $this->messages, $this->labels);
         return false;
+    }
+
+    protected function makeValidator($field, $validator)
+    {
+        $err = $validator->errors()->first($field->getErrorKey());
+        $column = $field->column();
+        if (is_string($column)) {
+            if (!array_has($this->input, $column)) {
+                return;
+            }
+            $this->input = $this->sanitizeInput($this->input, $column);
+            $this->allRules[$field->getErrorKey()] = ['required'];
+            $this->messages[$field->getErrorKey() . '.required'] = $err;
+            $this->labels[$field->getErrorKey()] = $field->label();
+        } else if (is_array($column)) {
+            foreach ($column as $key => $col) {
+                if (!array_key_exists($col, $this->input)) {
+                    return;
+                }
+                $this->input[$column . $key] = array_get($this->input, $column);
+                $this->allRules[$column . $key] = $fieldRules;
+                $this->messages[] = [$field->getErrorKey() . '.required' => $err];
+                $this->labels[$column . $key] = $this->label . "[$column]";
+            }
+        }
+    }
+
+    /**
+     * Sanitize input data.
+     *
+     * @param array  $input
+     * @param string $column
+     *
+     * @return array
+     */
+    protected function sanitizeInput($input, $column)
+    {
+        if ($this instanceof MultipleSelect) {
+            $value = array_get($input, $column);
+            array_set($input, $column, array_filter($value));
+        }
+        return $input;
     }
 
     /**
@@ -241,9 +302,10 @@ class Table extends Html
      */
     public function render()
     {
-        $this->plain = false;
         $this->buildFields();
-        $this->html = $this->tableWidget->render();
-        return parent::render();
+        $this->addVariables([
+            'table' => $this->tableWidget->render()
+        ]);
+        return view($this->getView(), $this->variables());
     }
 }

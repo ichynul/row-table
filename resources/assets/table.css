@@ -27,5 +27,5 @@ table.table-fields tbody td .form-group {
 
 table.table-fields .form-group.has-error .control-label,
 table.table-fields .form-group.has-error br {
-    display: none;
+    /*display: none;*/
 }
