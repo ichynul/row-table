@@ -1,0 +1,14 @@
+table.table-fields .control-label.col-xs-0,
+table.table-fields .control-label.col-sm-0,
+table.table-fields .control-label.col-md-0,
+table.table-fields.control-label.col-lg-0 {
+    display: none;
+}
+
+table.table-fields td {
+    border: 1px solid #f4f4f4
+}
+
+table.table-fields td .form-group {
+    margin-bottom: 0;
+}
