@@ -20,9 +20,9 @@ class Table extends Field
     ];
 
     /**
-     * @var TableWidget
+     * @var FromTable
      */
-    protected $tableWidget = null;
+    protected $fromTable = null;
 
     /**
      * @var string
@@ -63,13 +63,15 @@ class Table extends Field
      */
     protected $input = [];
 
-    public function __construct($form, $label)
+    public function __construct($label)
     {
-        $this->form = $form;
-        $this->tableWidget = new TableWidget([], []);
-        $this->tableWidget->class($this->defaultClass);
-        $this->callSubmitted();
-        parent::__construct('', $label);
+        $this->label = $label;
+
+        $this->column = '__tabel__';
+
+        $this->fromTable = new FromTable([], []);
+
+        $this->fromTable->class($this->defaultClass);
     }
 
     /**
@@ -77,15 +79,17 @@ class Table extends Field
      *
      * @return mixed
      */
-    protected function callSubmitted()
+    protected function bindSubmitted()
     {
         $this->form->submitted(function (Form $form) {
-            \Log::info('submitted');
+
             foreach ($this->rows as $row) {
+
                 foreach ($row->geFields() as $field) {
                     $this->form->builder()->fields()->push($field);
                 }
             }
+
         });
     }
 
@@ -98,7 +102,8 @@ class Table extends Field
      */
     public function useDiv($div)
     {
-        $this->tableWidget->useDiv($div);
+        $this->fromTable->useDiv($div);
+
         return $this;
     }
 
@@ -111,7 +116,8 @@ class Table extends Field
      */
     public function headersTh($th = true)
     {
-        $this->tableWidget->headersTh($th);
+        $this->fromTable->headersTh($th);
+
         return $this;
     }
 
@@ -124,7 +130,25 @@ class Table extends Field
      */
     public function setHeaders($headers = [])
     {
-        $this->tableWidget->setHeaders($headers);
+        $this->fromTable->setHeaders($headers);
+
+        return $this;
+    }
+
+    /**
+     * @param Form $form
+     *
+     * @return $this
+     */
+
+    public function setForm(Form $form = null)
+    {
+        $this->form = $form;
+
+        $this->form->ignore($this->column);
+
+        $this->bindSubmitted();
+
         return $this;
     }
 
@@ -142,17 +166,25 @@ class Table extends Field
         }
 
         $this->rows = $rows instanceof TableRow ? [$rows] : $rows;
+
         $formatId = '';
+
         foreach ($this->rows as $row) {
+
             foreach ($row->geFields() as $field) {
                 $formatId .= $this->formatId($field->column());
             }
+            $row->bindRows();
         }
+
         if (strlen($formatId) > 20) {
             $formatId = substr($formatId, 20);
         }
+
         $this->setErrorKey($formatId);
+
         $this->id = $formatId;
+
         return $this;
     }
 
@@ -165,7 +197,8 @@ class Table extends Field
      */
     public function tableStyle($style = [])
     {
-        $this->tableWidget->setStyle($style);
+        $this->fromTable->setStyle($style);
+
         return $this;
     }
 
@@ -178,41 +211,18 @@ class Table extends Field
      */
     public function tableClass($style = [])
     {
-        $this->tableWidget->class($this->defaultClass . implode(' ', $style));
+        $this->fromTable->class($this->defaultClass . implode(' ', $style));
         return $this;
     }
 
     /**
-     * get inner tableWidget
+     * get inner FromTable
      *
-     * @return TableWidget
+     * @return FromTable
      */
-    public function getTableWidget()
+    public function getFromTable()
     {
-        return $this->tableWidget;
-    }
-
-    protected function buildFields()
-    {
-        $tableRows = [];
-        $data = $this->form->model()->toArray();
-        foreach ($this->rows as $row) {
-            $columns = [];
-            foreach ($row->geFields() as $field) {
-                if (!$field instanceof Field) {
-                    $tableRows[] = $field;
-                    throw new \Exception('Column format error! Column must be a instanceof Encore\Admin\Form\Field');
-                }
-                $field->fill($data);
-                if (!$this->tableWidget->usingDiv()) {
-                    $field->setWidth(12, 0);
-                    $field->attribute(['title' => $field->column()]);
-                }
-                $columns[] = $field->render();
-            }
-            $tableRows[] = $columns;
-        }
-        $this->tableWidget->setRows($tableRows);
+        return $this->fromTable;
     }
 
     /**
@@ -228,51 +238,74 @@ class Table extends Field
             return $this->validator->call($this, $input);
         }
         $this->input = $input;
+
         $this->allRules = [];
+
         $this->messages = [];
+
         $this->labels = [];
 
         foreach ($this->rows as $row) {
+
             foreach ($row->geFields() as $field) {
+
                 if (!$validator = $field->getValidator($this->input)) {
                     continue;
                 }
+
                 if (($validator instanceof Validator) && !$validator->passes()) {
                     $this->makeValidator($field, $validator);
                 }
             }
         }
+
         if (empty($this->allRules)) {
             return false;
         }
+
         $this->allRules[$this->getErrorKey()] = ['required'];
+
         $this->messages[$this->getErrorKey() . '.required'] = implode(' ', array_values($this->messages));
+
         $this->labels[$this->getErrorKey()] = $this->label();
 
         return ValidatorTool::make($this->input, $this->allRules, $this->messages, $this->labels);
-        return false;
     }
 
     protected function makeValidator($field, $validator)
     {
         $err = $validator->errors()->first($field->getErrorKey());
+
         $column = $field->column();
+
         if (is_string($column)) {
+
             if (!array_has($this->input, $column)) {
                 return;
             }
+
             $this->input = $this->sanitizeInput($this->input, $column);
+
             $this->allRules[$field->getErrorKey()] = ['required'];
+
             $this->messages[$field->getErrorKey() . '.required'] = $err;
+
             $this->labels[$field->getErrorKey()] = $field->label();
+
         } else if (is_array($column)) {
+
             foreach ($column as $key => $col) {
+
                 if (!array_key_exists($col, $this->input)) {
                     return;
                 }
+
                 $this->input[$column . $key] = array_get($this->input, $column);
+
                 $this->allRules[$column . $key] = $fieldRules;
+
                 $this->messages[] = [$field->getErrorKey() . '.required' => $err];
+
                 $this->labels[$column . $key] = $this->label . "[$column]";
             }
         }
@@ -289,10 +322,40 @@ class Table extends Field
     protected function sanitizeInput($input, $column)
     {
         if ($this instanceof MultipleSelect) {
+
             $value = array_get($input, $column);
             array_set($input, $column, array_filter($value));
         }
+
         return $input;
+    }
+
+    /**
+     * Build fields
+     *
+     * @return void
+     */
+    protected function buildRows()
+    {
+        $data = $this->form->model()->toArray();
+
+        foreach ($this->rows as $row) {
+
+            foreach ($row->geFields() as $field) {
+
+                $field->fill($data);
+
+                if (!$this->fromTable->usingDiv()) {
+
+                    $field->setLabelClass(['hidden'])->attribute(['title' => $field->label()]);
+                } else {
+                    
+                    $row->autoSpan();
+                }
+            }
+        }
+
+        $this->fromTable->setRows($this->rows);
     }
 
     /**
@@ -302,10 +365,12 @@ class Table extends Field
      */
     public function render()
     {
-        $this->buildFields();
+        $this->buildRows();
+
         $this->addVariables([
-            'table' => $this->tableWidget->render()
+            'table' => $this->fromTable->render()
         ]);
+
         return view($this->getView(), $this->variables());
     }
 }

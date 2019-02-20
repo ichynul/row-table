@@ -15,8 +15,8 @@
     <tbody>
     @foreach($rows as $row)
     <tr>
-        @foreach($row as $item)
-        <td>{!! $item !!}</td>
+        @foreach($row->geFields() as $item)
+        <td colspan="{!! $row->getSpan($item->column()) !!}">{!! $item->render() !!}</td>
         @endforeach
     </tr>
     @endforeach

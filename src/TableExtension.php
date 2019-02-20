@@ -4,7 +4,7 @@ namespace Ichynul\RowTable;
 
 use Encore\Admin\Extension;
 
-class TableExt extends Extension
+class TableExtension extends Extension
 {
     public $name = 'row-table';
 

@@ -4,7 +4,7 @@ namespace Ichynul\RowTable;
 
 use Encore\Admin\Widgets\Table;
 
-class TableWidget extends Table
+class FromTable extends Table
 {
     /**
      * @var boolean
@@ -26,6 +26,7 @@ class TableWidget extends Table
     public function useDiv($div = true)
     {
         $this->useDiv = $div == true;
+
         return $this;
     }
 
@@ -39,6 +40,7 @@ class TableWidget extends Table
     public function headersTh($th = true)
     {
         $this->headers_th = $th == true;
+
         return $this;
     }
 
@@ -65,10 +67,14 @@ class TableWidget extends Table
     public function render()
     {
         if ($this->usingDiv()) {
-            $this->view = 'row-table::widgets.div';
+
+            $this->view = 'row-table::display.div';
+
         } else {
-            $this->view = 'row-table::widgets.table';
+
+            $this->view = 'row-table::display.table';
         }
+
         $vars = [
             'headers' => $this->headers,
             'rows' => $this->rows,
@@ -76,6 +82,7 @@ class TableWidget extends Table
             'attributes' => $this->formatAttributes(),
             'headers_th' => $this->headers_th
         ];
+
         return view($this->view, $vars)->render();
     }
 }

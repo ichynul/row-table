@@ -11,9 +11,9 @@ class RowTableServiceProvider extends ServiceProvider
     /**
      * {@inheritdoc}
      */
-    public function boot(TableExt $extension)
+    public function boot(TableExtension $extension)
     {
-        if (!TableExt::boot()) {
+        if (!TableExtension::boot()) {
             return;
         }
 
