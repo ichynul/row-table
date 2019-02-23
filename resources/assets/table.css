@@ -1,6 +1,9 @@
 table.table-fields tbody tr td {
     border: none;
-    padding: 0 6px;
+    padding-right: 10px;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 0;
 }
 
 table.table-fields thead tr td,
