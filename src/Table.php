@@ -4,11 +4,10 @@ namespace Ichynul\RowTable;
 
 use Encore\Admin\Form;
 use Encore\Admin\Form\Field;
-use Encore\Admin\Form\Field\MultipleSelect;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\MessageBag;
-use Illuminate\Support\Facades\Validator as ValidatorTool;
 use Illuminate\Validation\Validator;
+use Encore\Admin\Form\Field\MultipleSelect;
+use Illuminate\Support\Facades\Validator as ValidatorTool;
+use Ichynul\RowTable\Field\Show;
 
 class Table extends Field
 {
@@ -50,20 +49,23 @@ class Table extends Field
      * @var array
      */
     protected $allRules = [];
+
     /**
      * @var array
      */
     protected $messages = [];
+
     /**
      * @var array
      */
     protected $labels = [];
+
     /**
      * @var array
      */
     protected $input = [];
 
-    public function __construct($label)
+    public function __construct($label, $arguments = [])
     {
         $this->label = $label;
 
@@ -83,13 +85,15 @@ class Table extends Field
     {
         $this->form->submitted(function (Form $form) {
 
+            $this->form->ignore($this->column);
+
             foreach ($this->rows as $row) {
 
                 foreach ($row->geFields() as $field) {
+
                     $this->form->builder()->fields()->push($field);
                 }
             }
-
         });
     }
 
@@ -100,7 +104,7 @@ class Table extends Field
      *
      * @return $this
      */
-    public function useDiv($div)
+    public function useDiv($div = true)
     {
         $this->fromTable->useDiv($div);
 
@@ -145,8 +149,6 @@ class Table extends Field
     {
         $this->form = $form;
 
-        $this->form->ignore($this->column);
-
         $this->bindSubmitted();
 
         return $this;
@@ -171,9 +173,15 @@ class Table extends Field
 
         foreach ($this->rows as $row) {
 
+            $row->setTable($this->fromTable);
+
             foreach ($row->geFields() as $field) {
+
+                $field->setForm($this->form);
+
                 $formatId .= $this->formatId($field->column());
             }
+
             $row->bindRows();
         }
 
@@ -284,14 +292,13 @@ class Table extends Field
                 return;
             }
 
-            $this->input = $this->sanitizeInput($this->input, $column);
+            $this->input = $this->sanitizeFieldInput($field, $this->input, $column);
 
             $this->allRules[$field->getErrorKey()] = ['required'];
 
             $this->messages[$field->getErrorKey() . '.required'] = $err;
 
             $this->labels[$field->getErrorKey()] = $field->label();
-
         } else if (is_array($column)) {
 
             foreach ($column as $key => $col) {
@@ -302,7 +309,7 @@ class Table extends Field
 
                 $this->input[$column . $key] = array_get($this->input, $column);
 
-                $this->allRules[$column . $key] = $fieldRules;
+                $this->allRules[$column . $key] =  ['required'];
 
                 $this->messages[] = [$field->getErrorKey() . '.required' => $err];
 
@@ -313,21 +320,40 @@ class Table extends Field
 
     /**
      * Sanitize input data.
-     *
+     * @param array  $field
      * @param array  $input
      * @param string $column
      *
      * @return array
      */
-    protected function sanitizeInput($input, $column)
+    protected function sanitizeFieldInput($field, $input, $column)
     {
-        if ($this instanceof MultipleSelect) {
+        if ($field instanceof MultipleSelect) {
 
             $value = array_get($input, $column);
+
             array_set($input, $column, array_filter($value));
         }
 
         return $input;
+    }
+
+    /**
+     * Fill data to the field.
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    public function fill($data)
+    {
+        foreach ($this->rows as $row) {
+
+            foreach ($row->geFields() as $field) {
+
+                $field->fill($data);
+            }
+        }
     }
 
     /**
@@ -337,19 +363,19 @@ class Table extends Field
      */
     protected function buildRows()
     {
-        $data = $this->form->model()->toArray();
-
         foreach ($this->rows as $row) {
 
             foreach ($row->geFields() as $field) {
 
-                $field->fill($data);
-
                 if (!$this->fromTable->usingDiv()) {
 
-                    $field->setLabelClass(['hidden'])->attribute(['title' => $field->label()]);
+                    if (!$field instanceof Show) {
+                        $field->setLabelClass(['hidden'])->attribute(['title' => $field->label()]);
+                    }
+
+                    $field->setWidth(12, 0);
                 } else {
-                    
+
                     $row->autoSpan();
                 }
             }

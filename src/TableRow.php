@@ -2,11 +2,8 @@
 
 namespace Ichynul\RowTable;
 
-use Closure;
 use Encore\Admin\Form;
-use Encore\Admin\Extension;
 use Encore\Admin\Form\Field;
-use Encore\Admin\Form\Field\Html;
 
 class TableRow
 {
@@ -24,6 +21,11 @@ class TableRow
      * @var boolean
      */
     protected $bind_rows = false;
+
+    /**
+     * @var FormTable
+     */
+    protected $table = false;
 
     /**
      * Get rows
@@ -94,7 +96,7 @@ class TableRow
 
         $rows = count($this->fields);
 
-        if ($use < 10 || $defaults == $rows) {
+        if ($defaults == $rows) {
 
             $this->rwo_spans = [];
 
@@ -104,20 +106,17 @@ class TableRow
 
                     $this->rwo_spans[$field->column()] = 3;
 
-                    $field->setWidth(7, 5);
-
+                    $field->setWidth(6, 6);
                 } else if ($rows == 3) {
 
                     $this->rwo_spans[$field->column()] = 4;
 
                     $field->setWidth(8, 4);
-
                 } else if ($rows == 2) {
 
                     $this->rwo_spans[$field->column()] = 6;
 
-                    $field->setWidth(9, 3);
-
+                    $field->setWidth(8, 2);
                 } else {
 
                     $this->rwo_spans[$field->column()] = 12;
@@ -145,7 +144,7 @@ class TableRow
             return 1;
         }
 
-        return $this->rwo_spans[$column] ? : 1;
+        return $this->rwo_spans[$column] ?: 1;
     }
 
     /**
@@ -160,16 +159,13 @@ class TableRow
     }
 
     /**
-     * call methd each rows
-     * 
+     * set table 
+     *
      * @return $this
      */
-    public function each(Closure $callback)
+    public function setTable($table)
     {
-        foreach ($this->fields as $field) {
-            $callback->call($this, $field);
-        }
-
+        $this->table = $table;
         return $this;
     }
 
@@ -192,6 +188,8 @@ class TableRow
             if (!$this->bind_rows) {
 
                 $rowspan = count($arguments) > 2 ? array_get($arguments, 2, 1) : array_get($arguments, 1, 1);
+
+                $element->setWidth(8, 4);
 
                 $this->pushField($element, $rowspan);
 

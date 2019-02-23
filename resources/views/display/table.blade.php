@@ -4,9 +4,9 @@
     <tr>
         @foreach($headers as $header)
             @if($headers_th)
-            <th>{{ $header }}</th>
+            <th>{!! $header !!}</th>
             @else
-            <td>{{ $header }}</td>
+            <td>{!! $header !!}</td>
             @endif
         @endforeach
     </tr>

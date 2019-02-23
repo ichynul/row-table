@@ -15,12 +15,32 @@ $ php artisan vendor:publish --tag=row-table
 
 ```
 
+## Update it
+
+After `composer update` , if version of this extension changed :
+
+Run 
+
+```
+php artisan vendor:publish --tag=row-table --force
+```
+
+This will override css and js fiels to `/public/vendor/laravel-admin-ext/row-table/`
+
+Or you can and a script in `composer.json` :
+
+```json
+"scripts": {
+    "post-update-cmd": "php artisan vendor:publish --tag=row-table --force",
+}
+```
+
 ## Usage
 
 ```php
 protected function form()
 {
-    $form = new Form(new Task);
+        $form = new Form(new Task);
 
         $headers = ['备注', '服务费用', '服务评分'];
         $tableRow = new TableRow();
@@ -50,9 +70,9 @@ protected function form()
         $form->display('updated_at', trans('admin.updated_at'));
 
         /**
-         * $tableRow-element($column, $label, $width); //div 时
+         * $tableRow-element($column, $label, $width); //div 时 class="col-sm-$width"
          *
-         * $tableRow-element($column, $width); // table 时
+         * $tableRow-element($column, $rowspan); // table 时 rowspan="$width"
          *
          * $tableRow-element($column); 都可以
          *
@@ -63,7 +83,7 @@ protected function form()
          *
          *         div模式   时 为 class="col-sm-width" . 排列不下时自动换行
          *
-         *         div模式 若一个tableRow中所有元素都未设置 $width ,将会自适应 (columns > =4 每行4个并自动换行，小于4则全部在一行)
+         *         div模式 若一个tableRow中所有元素都未设置 $width ,将会自适应 (columns >=4 每行4个并自动换行，小于4则全部在一行)
          */
 
         return $form;

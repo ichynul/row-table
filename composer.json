@@ -3,7 +3,7 @@
     "description": "laravel-admin extension row-table",
     "type": "library",
     "keywords": ["laravel-admin", "extension"],
-    "homepage": "https://github.com/laravel-admin-ext/row-table",
+    "homepage": "https://github.com/ichynul/row-table",
     "license": "MIT",
     "authors": [
         {
