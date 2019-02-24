@@ -49,6 +49,10 @@ div.table.table-fields td .form-group {
     margin-bottom: 7px
 }
 
-.table.table-fields .col-sm-12.control-label {
+.table.table-fields .col-sm-12 .control-label {
     text-align: left;
+}
+
+.table.table-fields .show-text {
+    vertical-align: middle;
 }

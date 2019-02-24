@@ -86,7 +86,6 @@
                 $j += 1;
                 if ($i % 3 == 0) {
                     $row->checkbox("table_2_{$i}_{$j}", $month . '工资', 6) //radio 比较占地方 col-sm-6,每行2列
-                        ->rules(($i * $j) % 6 == 0 ? 'int' : '')
                         ->options(['3000' => '￥3000', '4000' => '￥4000', '8000' => '￥8000']);
                 } else if ($i % 4 == 0) {
                     $row->select("table_2_{$i}_{$j}", $month . '工资', 4) //col-sm-4,每行3列
@@ -116,7 +115,7 @@
 
         $userRow2 = new TableRow();
         $userRow2->number('age', '年龄', 6)->max(99)->min(18);
-        $userRow2->date('birthday', '生日', 6)->rules('required');;
+        $userRow2->date('birthday', '生日', 6)->rules('required');
 
         $userRow2->textarea('about', '个人简介', 12)->setWidth(10, 2); //独占一行，因为其他行有两列
 

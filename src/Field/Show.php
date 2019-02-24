@@ -9,19 +9,19 @@ class Show extends Field
     /**
      * @var string
      */
-    protected $text = '';
+    protected $html = '';
 
     /**
      * @var string
      */
-    protected $textWidth = 'auto';
+    protected $view = 'row-table::field.show';
 
     /**
-     * text-align
+     * styles
      *
-     * @var string
+     * @var array
      */
-    protected $align = 'center';
+    protected $styles = [];
 
     /**
      * set text-align
@@ -31,7 +31,7 @@ class Show extends Field
      */
     public function Textalign($align)
     {
-        $this->align = $align;
+        $this->addStyle('text-align', $align);
 
         return $this;
     }
@@ -44,7 +44,20 @@ class Show extends Field
      */
     public function textWidth($width)
     {
-        $this->textWidth = $width;
+        $this->addStyle('width', $width);
+
+        return $this;
+    }
+
+    /**
+     * set text-align
+     *
+     * @param [strign] $align
+     * @return $this
+     */
+    public function addStyle($key, $val)
+    {
+        $this->styles[$key] =   $val;
 
         return $this;
     }
@@ -55,24 +68,44 @@ class Show extends Field
      * @param mixed $text
      * @param array $arguments
      */
-    public function __construct($text, $arguments = [])
+    public function __construct($html, $arguments = [])
     {
-        $this->text = $text;
+        $this->html = $html;
 
         $this->width['field']  = array_get($arguments, 0, 12);
+
+        $this->addStyle('width', 'auto');
+
+        $this->addStyle('text-align', 'center');
+
+        $this->addStyle('min-width', '100px');
     }
 
-    public function render()
+    public function variables()
     {
-        $viewClass = [
-            'label'      => "col-sm-{$this->width['field']} {$this->getLabelClass()}",
-            'form-group' => 'form-group ',
-        ];
+        return array_merge($this->variables, [
+            'help'        => $this->help,
+            'class'       => $this->getElementClassString(),
+            'value'       => $this->html,
+            'viewClass'   => $this->getViewElementClasses(),
+            'attributes'  => $this->formatAttributes(),
+            'divsSyles' => $this->formatStyles(),
+        ]);
+    }
 
-        return <<<EOT
-<div class="form-group" style="text-align:{$this->align};width:{$this->textWidth};min-width:100px;">
-    <label style="text-align:{$this->align};" class="{$viewClass['label']} control-label">{$this->text}</label>
-</div>
-EOT;
+    /**
+     * Format the field attributes.
+     *
+     * @return string
+     */
+    protected function formatStyles()
+    {
+        $html = [];
+
+        foreach ($this->styles as $name => $value) {
+            $html[] = $name . ': ' . $value;
+        }
+
+        return implode(' ;', $html);
     }
 }
