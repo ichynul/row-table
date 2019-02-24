@@ -21,9 +21,6 @@
          *
          * $tableRow-show($text, $rowspan)->Textalign($align)->textWidth($textWidth);  //table 时  rowspan="{$width}";
          *
-         * <div class="form-group" style="text-align:{$align};width:{$textWidth};min-width:100px;">
-         *  <label style="text-align:{$align};" class="col-sm-{$width} control-label">{$text}</label>
-         *</div>
          */
 
         $form = new Form(new User);
