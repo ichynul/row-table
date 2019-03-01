@@ -276,7 +276,7 @@ class Table extends Field
         $this->messages[$this->getErrorKey() . '.required'] = implode(' ', array_values($this->messages));
 
         $this->labels[$this->getErrorKey()] = $this->label();
-
+        
         return ValidatorTool::make($this->input, $this->allRules, $this->messages, $this->labels);
     }
 
