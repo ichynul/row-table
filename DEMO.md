@@ -11,23 +11,25 @@
          * show => \Ichynul\RowTable\Field\Show::class
          *
          ****************************************************************************************************
-         * $tableRow-element($column, $label, $width); //div 时 class="col-sm-{$width}"
+         * $tableRow-element($column, $label, $width); //div时 [useDiv(true)]  class="col-sm-{$width}"
          *
-         * $tableRow-element($column, $rowspan); // table 时 rowspan="{$width}"
+         * $tableRow-element($column, $label, $colspan); // table 时 colspan="{$colspan}"
          *
-         * $tableRow-element($column); 都可以
+         * $tableRow-show($html, $label, $width)->Textalign($align);  //div时 [useDiv(true)] class="col-sm-{$width}"
          *
-         * $tableRow-show($text, $width)->Textalign($align);  //div 时 class="col-sm-{$width}"
+         * $tableRow-show($html, $label , $colspan)->Textalign($align)->textWidth($textWidth);  //table 时  colspan="{$colspan}";
          *
-         * $tableRow-show($text, $rowspan)->Textalign($align)->textWidth($textWidth);  //table 时  rowspan="{$width}";
-         *
+         * $tableRow-show($html, $label , $width)->addStyle('text-align', $align)->addStyle('width',$textWidth)->addStyle('anystyle','anyvalue');
          */
 
         $form = new Form(new User);
 
         $form->text('somerow', '混合使用form')->rules('required');
 
-        $form->show("<h3>************Demo 1 , 使用 table************</h3>")->textWidth('100%')->Textalign('center');
+       //$form->show("<h3>************Demo 1 , 使用 table************</h3>")->textWidth('100%')->Textalign('center');
+        // equals 
+        $form->show("<h3>************Demo 1 , 使用 table************</h3>")->addStyle('width', '100%')->addStyle('text-align', 'center');
+
         $form->divide();
         /*************************************/
 
@@ -39,8 +41,11 @@
         $h = new Show('姓名\\月份');
         $headers1[] = $h->textWidth('120px')->render();
 
+        $m = 0;
         foreach ($months as $month) {
+            $m += 1;
             $h = new Show($month);
+            $h->addStyle('background-color', $m % 3 == 0 ? 'green' : '#f1f1f1');
             $headers1[] = $h->render();
         }
 
@@ -53,7 +58,7 @@
         foreach ($names as $name) {
             $row = new TableRow();
             $i += 1;
-            $row->show($name);
+            $row->show($name)->addStyle('color', $i % 2 == 0 ? 'blue' : 'orange');
             foreach ($months as $month) {
                 $j += 1;
                 $row->textSmall("table_1_{$i}_{$j}", $month . '工资')->rules(($i * $j) % 10 == 0 ? 'min:3' : '');
@@ -67,7 +72,7 @@
 
         /*************************************/
 
-        $form->show("<h3>************Demo 2 , 使用 div************</h3>")->textWidth('100%')->Textalign('center');
+        $form->show("<h3>************Demo 2 , 使用 div************</h3>")->textWidth('100%')->Textalign('center')->addStyle('color', 'red');
 
         $form->icon('somerow2', '中间混合使用form')->rules('required');
 
@@ -136,8 +141,8 @@
 
         /*********************/
         $userRow5 = new TableRow();
-        $userRow5->show('姓名')->Textalign('left');
-        $userRow5->show('性别')->Textalign('left');
+        userRow5->show('姓名')->Textalign('left')->addStyle('color', 'red');
+        $userRow5->show('性别')->Textalign('left')->addStyle('color', 'blue')->addStyle('font-size', '18px'); // add styles
 
         $userRow6 = new TableRow();
         $userRow6->text('name');
@@ -145,7 +150,7 @@
 
         /*********************/
         $userRow7 = new TableRow();
-        $userRow7->show('年龄')->Textalign('left');;
+        $userRow7->show('年龄')->Textalign('left')->addStyle('color', 'red');
         $userRow7->show('生日')->Textalign('left');
 
         $userRow8 = new TableRow();
@@ -154,10 +159,10 @@
 
         /*********************/
         $userRow9 = new TableRow();
-        $userRow9->show('个人简介', 2)->Textalign('left'); // rowspan=2
+        $userRow9->show('个人简介', 2)->Textalign('left'); // colspan=2
 
         $userRow10 = new TableRow();
-        $userRow10->textarea('about', 2); // rowspan=2
+        $userRow10->textarea('about', 2); // colspan=2
 
         /*********************/
         $form->table('个人中心2')
@@ -165,7 +170,7 @@
 
         $form->divide();
         /*************************************/
-        $form->show("<h3>************Demo 5 , table rowspan, ************</h3>")->textWidth('100%')->Textalign('center');
+        $form->show("<h3>************Demo 5 , table colspan, ************</h3>")->textWidth('100%')->Textalign('center');
 
         $tableRow = new TableRow();
 
@@ -188,7 +193,7 @@
         $tableRow3->text('row10', 2)->rules('required');;
         $tableRow3->text('row11', 1);
 
-        $form->table('Using rowspan')
+        $form->table('Using colspan')
             ->setRows([$tableRow, $tableRow1, $tableRow3, $tableRow2]);
 
         $form->divide();

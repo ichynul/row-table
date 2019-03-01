@@ -78,7 +78,7 @@ class Show extends Field
 
         $this->addStyle('text-align', 'center');
 
-        $this->addStyle('min-width', '100px');
+        $this->addStyle('min-width', '70px');
     }
 
     public function variables()

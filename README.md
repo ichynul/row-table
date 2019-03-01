@@ -72,9 +72,7 @@ protected function form()
         /**
          * $tableRow-element($column, $label, $width); //div 时 class="col-sm-$width"
          *
-         * $tableRow-element($column, $rowspan); // table 时 rowspan="$width"
-         *
-         * $tableRow-element($column); 都可以
+         * $tableRow-element($column, $colspan); // table 时 colspan="$width"
          *
          * $element: 理论上可以是任何 form 元素 (不考虑布局效果)
          *

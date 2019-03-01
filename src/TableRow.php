@@ -10,7 +10,7 @@ class TableRow
     /**
      * @var array
      */
-    protected $rwo_spans = [];
+    protected $col_spans = [];
 
     /**
      * @var array
@@ -42,9 +42,9 @@ class TableRow
      *
      * @return $this
      */
-    public function pushField(Field $field, $row_span)
+    public function pushField(Field $field, $colspan = 1)
     {
-        $column = $field->column();
+        $field->column();
 
         $label = $field->label();
 
@@ -57,7 +57,7 @@ class TableRow
 
         $this->fields[] = $field;
 
-        $this->rwo_spans[$field->column()] = is_numeric($row_span) ? $row_span : 1;
+        $this->col_spans[$field->column()] = is_numeric($colspan) ? $colspan : 1;
 
         return $this;
     }
@@ -98,28 +98,28 @@ class TableRow
 
         if ($defaults == $rows) {
 
-            $this->rwo_spans = [];
+            $this->col_spans = [];
 
             foreach ($this->fields as $field) {
 
                 if ($rows >= 4) {
 
-                    $this->rwo_spans[$field->column()] = 3;
+                    $this->col_spans[$field->column()] = 3;
 
                     $field->setWidth(6, 6);
                 } else if ($rows == 3) {
 
-                    $this->rwo_spans[$field->column()] = 4;
+                    $this->col_spans[$field->column()] = 4;
 
                     $field->setWidth(8, 4);
                 } else if ($rows == 2) {
 
-                    $this->rwo_spans[$field->column()] = 6;
+                    $this->col_spans[$field->column()] = 6;
 
                     $field->setWidth(8, 2);
                 } else {
 
-                    $this->rwo_spans[$field->column()] = 12;
+                    $this->col_spans[$field->column()] = 12;
 
                     $field->setWidth(10, 2);
                 }
@@ -136,25 +136,25 @@ class TableRow
      */
     public function getSpan($column)
     {
-        if (empty($this->rwo_spans)) {
+        if (empty($this->col_spans)) {
             return 1;
         }
 
-        if (!array_key_exists($column, $this->rwo_spans)) {
+        if (!array_key_exists($column, $this->col_spans)) {
             return 1;
         }
 
-        return $this->rwo_spans[$column] ?: 1;
+        return $this->col_spans[$column] ?: 1;
     }
 
     /**
-     * set rwo_spans 
+     * set col_spans 
      *
      * @return $this
      */
-    public function setRowspans(array $rwo_spans)
+    public function setcolspans(array $col_spans)
     {
-        $this->rwo_spans = $rwo_spans;
+        $this->col_spans = $col_spans;
         return $this;
     }
 
@@ -183,20 +183,20 @@ class TableRow
 
             $column = array_get($arguments, 0, ''); //[0];
 
-            $element = new $className($column, array_slice($arguments, 1));
+            $label = array_slice($arguments, 1, '');
+
+            $element = new $className($column, is_numeric($label) ? $column : $label);
 
             if (!$this->bind_rows) {
 
-                $rowspan = count($arguments) > 2 ? array_get($arguments, 2, 1) : array_get($arguments, 1, 1);
+                $colspan = count($arguments) > 2 ? array_get($arguments, 2, 1) : array_get($arguments, 1, 1);
 
                 $element->setWidth(8, 4);
 
-                $this->pushField($element, $rowspan);
+                $this->pushField($element, $colspan);
 
                 return $element;
             }
-
-            $label = array_get($arguments, 1, '');
 
             $args = $label ? "'{$column}', '$label'" : "$column";
 
