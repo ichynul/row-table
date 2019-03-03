@@ -141,7 +141,7 @@
 
         /*********************/
         $userRow5 = new TableRow();
-        userRow5->show('姓名')->Textalign('left')->addStyle('color', 'red');
+        $userRow5->show('姓名')->Textalign('left')->addStyle('color', 'red');
         $userRow5->show('性别')->Textalign('left')->addStyle('color', 'blue')->addStyle('font-size', '18px'); // add styles
 
         $userRow6 = new TableRow();
