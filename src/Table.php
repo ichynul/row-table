@@ -74,6 +74,15 @@ class Table extends Field
         $this->fromTable = new FromTable([], []);
 
         $this->fromTable->class($this->defaultClass);
+
+        $func =  array_get($arguments, 0, null);
+        
+        \Log::info(typeOf( $func));
+
+        if ($func && $func instanceof Closure) {
+
+            call_user_func($func, $this);
+        }
     }
 
     /**
@@ -276,7 +285,7 @@ class Table extends Field
         $this->messages[$this->getErrorKey() . '.required'] = implode(' ', array_values($this->messages));
 
         $this->labels[$this->getErrorKey()] = $this->label();
-        
+
         return ValidatorTool::make($this->input, $this->allRules, $this->messages, $this->labels);
     }
 

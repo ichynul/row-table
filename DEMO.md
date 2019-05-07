@@ -66,7 +66,7 @@
             $tablerows[] = $row;
         }
 
-        $form->table('工资情况')
+        $form->rowtable('工资情况')
             ->setHeaders($headers1)
             ->setRows($tablerows);
 
@@ -98,7 +98,7 @@
                         ->rules(($i * $j) % 8 == 0 ? 'required' : '');
                 }
             }
-            $form->table($name . '工资')
+            $form->rowtable($name . '工资')
                 ->setRows($row)
                 ->useDiv(true);
             $form->divide();
@@ -121,7 +121,7 @@
 
         $userRow2->textarea('about', '个人简介', 12)->setWidth(10, 2); //独占一行，因为其他行有两列
 
-        $form->table('个人中心', '11')
+        $form->rowtable('个人中心', '11')
             ->setRows([$userRow, $userRow1, $userRow2])
             ->useDiv(true);
 
@@ -165,7 +165,7 @@
         $userRow10->textarea('about', 2); // colspan=2
 
         /*********************/
-        $form->table('个人中心2')
+        $form->rowtable('个人中心2')
             ->setRows([$userRow3, $userRow4, $userRow5, $userRow6, $userRow7, $userRow8, $userRow9, $userRow10]);
 
         $form->divide();
@@ -193,7 +193,7 @@
         $tableRow3->text('row10', 2)->rules('required');;
         $tableRow3->text('row11', 1);
 
-        $form->table('Using colspan')
+        $form->rowtable('Using colspan')
             ->setRows([$tableRow, $tableRow1, $tableRow3, $tableRow2]);
 
         $form->divide();

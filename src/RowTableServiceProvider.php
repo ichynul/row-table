@@ -5,7 +5,6 @@ namespace Ichynul\RowTable;
 use Encore\Admin\Form;
 use Encore\Admin\Admin;
 use Illuminate\Support\ServiceProvider;
-use Encore\Admin\Form\Field;
 
 class RowTableServiceProvider extends ServiceProvider
 {
@@ -33,7 +32,7 @@ class RowTableServiceProvider extends ServiceProvider
 
         Admin::booting(function () {
 
-            Form::extend('table', Table::class);
+            Form::extend('rowtable', Table::class);
 
             Form::extend('textSmall',  \Ichynul\RowTable\Field\TextSmall::class);
 

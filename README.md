@@ -56,7 +56,7 @@ protected function form()
         $tableRow2->text('username', '姓名');
         $tableRow2->text('viwe', '查看');
 
-        $form->table('任务信息1')
+        $form->rowtable('任务信息1')
             ->setHeaders($headers)//使用table时设置，div设置无效
             //->setRows($tableRow)//设置 一个row
             ->setRows([$tableRow, $tableRow2])
