@@ -77,8 +77,6 @@ class Table extends Field
 
         $func =  array_get($arguments, 0, null);
         
-        \Log::info(typeOf( $func));
-
         if ($func && $func instanceof Closure) {
 
             call_user_func($func, $this);
