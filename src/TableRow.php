@@ -183,7 +183,7 @@ class TableRow
 
             $column = array_get($arguments, 0, ''); //[0];
 
-            $label = array_slice($arguments, 1, '');
+            $label = array_slice($arguments, 1);
 
             $element = new $className($column, is_numeric($label) ? $column : $label);
 
