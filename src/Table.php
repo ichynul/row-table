@@ -2,12 +2,13 @@
 
 namespace Ichynul\RowTable;
 
+use Closure;
 use Encore\Admin\Form;
 use Encore\Admin\Form\Field;
+use Ichynul\RowTable\Field\Show;
 use Illuminate\Validation\Validator;
 use Encore\Admin\Form\Field\MultipleSelect;
 use Illuminate\Support\Facades\Validator as ValidatorTool;
-use Ichynul\RowTable\Field\Show;
 
 class Table extends Field
 {
@@ -76,9 +77,9 @@ class Table extends Field
         $this->fromTable->class($this->defaultClass);
 
         $func =  array_get($arguments, 0, null);
-        
-        if ($func && $func instanceof Closure) {
 
+        if ($func && $func instanceof Closure) {
+            
             call_user_func($func, $this);
         }
     }

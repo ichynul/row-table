@@ -181,15 +181,19 @@ class TableRow
     {
         if ($className = Form::findFieldClass($method)) {
 
-            $column = array_get($arguments, 0, ''); //[0];
+            $column = array_get($arguments, 0, '');
 
-            $label = array_slice($arguments, 1);
+            $arguments = array_slice($arguments, 1);
 
-            $element = new $className($column, is_numeric($label) ? $column : $label);
+            $label = array_get($arguments, 0, '');
+
+            $element = new $className($column, [is_numeric($label) ? $column : $label]);
 
             if (!$this->bind_rows) {
 
-                $colspan = count($arguments) > 2 ? array_get($arguments, 2, 1) : array_get($arguments, 1, 1);
+                $colspan = count($arguments) > 1 ? array_get($arguments, 1, 1) : array_get($arguments, 0, 1);
+
+                $colspan = is_numeric($colspan) ? $colspan : 1;
 
                 $element->setWidth(8, 4);
 
