@@ -19,7 +19,7 @@ $ php artisan vendor:publish --tag=row-table
 
 After `composer update` , if version of this extension changed :
 
-Run 
+Run
 
 ```
 php artisan vendor:publish --tag=row-table --force
@@ -64,6 +64,31 @@ protected function form()
             //->headersTh(true);//使用table时 头部使用<th></th>，默认使用<td></td>样式有些差别
             //->getTableWidget()//extends Encore\Admin\Widgets\Table
             //->offsetSet("style", "width:1000px;");
+
+        // 另外一种代码风格 Another code style
+         $form->rowtable('任务信息2', function ($table) {
+            $table->row(function ($row) {
+                $row->text('text1', 'label1')->rules('required');
+                $row->text('text2', 'label2');
+                $row->text('text3', 'label3');
+            });
+            $table->row(function ($row) {
+                $row->text('text4', 'label4');
+                $row->text('text5', 'label5');
+                $row->text('text6', 'label6');
+            });
+            $table->row(function ($row) {
+                $row->text('text7', 'label7');
+                $row->text('text8', 'label8');
+                $row->text('text9', 'label9');
+            });
+            //$table->useDiv(false);
+            //$table->setHeaders(['h1','h2']);
+            //$table->useDiv(false);
+            //$table->headersTh(true);//使用table时 头部使用<th></th>，默认使用<td></td>样式有些差别
+            //$table->getTableWidget()//extends Encore\Admin\Widgets\Table
+            //->offsetSet("style", "width:1000px;");
+        });
 
         $form->textarea('remark', '备注')->rules('required');
         $form->display('created_at', trans('admin.created_at'));

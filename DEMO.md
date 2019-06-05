@@ -27,7 +27,7 @@
         $form->text('somerow', '混合使用form')->rules('required');
 
        //$form->show("<h3>************Demo 1 , 使用 table************</h3>")->textWidth('100%')->Textalign('center');
-        // equals 
+        // equals
         $form->show("<h3>************Demo 1 , 使用 table************</h3>")->addStyle('width', '100%')->addStyle('text-align', 'center');
 
         $form->divide();
@@ -112,7 +112,7 @@
         $userRow->html('<span style="margin-top:10px;" class="label label-warning">没个性也签名~</span>', '个性签名', 6);
 
         $userRow1 = new TableRow();
-        $userRow1->text('name', '姓名', 6)->rules('required');;
+        $userRow1->text('name', '姓名', 6)->rules('required');
         $userRow1->radio('gender', '性别', 6)->options(['0' => '保密', '1' => '男', '2' => '女']);
 
         $userRow2 = new TableRow();
@@ -131,70 +131,76 @@
 
         //这个比较麻烦,仅作为演示
         /*********************/
-        $userRow3 = new TableRow();
-        $userRow3->show('头像')->Textalign('left');
-        $userRow3->show('个性签名')->Textalign('left');
 
-        $userRow4 = new TableRow();
-        $userRow4->image('photo')->default('/vendor/laravel-admin/AdminLTE/dist/img/default-50x50.gif');
-        $userRow4->show('<span class="label label-info">没个性也签名~</span>')->Textalign('left');
+        $form->rowtable('Using colspan', function ($table) {
+            $table->row(function ($row) {
+                $row->show('头像')->Textalign('left');
+                $row->show('个性签名')->Textalign('left');
+            });
 
-        /*********************/
-        $userRow5 = new TableRow();
-        $userRow5->show('姓名')->Textalign('left')->addStyle('color', 'red');
-        $userRow5->show('性别')->Textalign('left')->addStyle('color', 'blue')->addStyle('font-size', '18px'); // add styles
+            $table->row(function ($row) {
+                $row->image('photo')->default('/vendor/laravel-admin/AdminLTE/dist/img/default-50x50.gif');
+                $row->show('<span class="label label-info">没个性也签名~</span>')->Textalign('left');
+            });
 
-        $userRow6 = new TableRow();
-        $userRow6->text('name');
-        $userRow6->radio('gender')->options(['0' => '保密', '1' => '男', '2' => '女']);
+            $table->row(function ($row) {
+                $row->show('姓名')->Textalign('left')->addStyle('color', 'red');
+                $row->show('性别')->Textalign('left')->addStyle('color', 'blue')->addStyle('font-size', '18px'); // add styles
+            });
 
-        /*********************/
-        $userRow7 = new TableRow();
-        $userRow7->show('年龄')->Textalign('left')->addStyle('color', 'red');
-        $userRow7->show('生日')->Textalign('left');
+            $table->row(function ($row) {
+                $row->text('name');
+                $row->radio('gender')->options(['0' => '保密', '1' => '男', '2' => '女']);
+            });
 
-        $userRow8 = new TableRow();
-        $userRow8->number('age', '年龄')->max(99)->min(18);
-        $userRow8->date('birthday', '生日');
+            $table->row(function ($row) {
+                $row->show('年龄')->Textalign('left')->addStyle('color', 'red');
+                $row->show('生日')->Textalign('left');
+            });
 
-        /*********************/
-        $userRow9 = new TableRow();
-        $userRow9->show('个人简介', 2)->Textalign('left'); // colspan=2
+            $table->row(function ($row) {
+                $row->number('age', '年龄')->max(99)->min(18);
+                $row->date('birthday', '生日');
+            });
 
-        $userRow10 = new TableRow();
-        $userRow10->textarea('about', 2); // colspan=2
+            $table->row(function ($row) {
+                $row->show('个人简介', 2)->Textalign('left'); // colspan=2
+            });
 
-        /*********************/
-        $form->rowtable('个人中心2')
-            ->setRows([$userRow3, $userRow4, $userRow5, $userRow6, $userRow7, $userRow8, $userRow9, $userRow10]);
+            $table->row(function ($row) {
+                $row->textarea('about', 2); // colspan=2
+            });
+        });
 
         $form->divide();
         /*************************************/
         $form->show("<h3>************Demo 5 , table colspan, ************</h3>")->textWidth('100%')->Textalign('center');
 
-        $tableRow = new TableRow();
+        $form->rowtable('Using colspan', function ($table) {
+            $table->row(function ($row) {
+                $row->text('row1'); //defautt 1
+                $row->text('row2');
+                $row->text('row3')->rules('required');
+                $row->text('row4');
+            });
 
-        $tableRow->text('row1'); //defautt 1
-        $tableRow->text('row2');
-        $tableRow->text('row3')->rules('required');;
-        $tableRow->text('row4');
+            $table->row(function ($row) {
+                $row->text('row5', 2);
+                $row->text('row6', 2);
+            });
 
-        $tableRow1 = new TableRow();
-        $tableRow1->text('row5', 2);
-        $tableRow1->text('row6', 2);
+            $table->row(function ($row) {
+                $row->text('row7', 2);
+                $row->text('row8'); //defautt 1
+                $row->text('row8', 1)->rules('required');
+            });
 
-        $tableRow2 = new TableRow();
-        $tableRow2->text('row7', 2);
-        $tableRow2->text('row8'); //defautt 1
-        $tableRow2->text('row8', 1)->rules('required');;
-
-        $tableRow3 = new TableRow();
-        $tableRow3->text('row9', 1);
-        $tableRow3->text('row10', 2)->rules('required');;
-        $tableRow3->text('row11', 1);
-
-        $form->rowtable('Using colspan')
-            ->setRows([$tableRow, $tableRow1, $tableRow3, $tableRow2]);
+            $table->row(function ($row) {
+                $row->text('row9', 1);
+                $row->text('row10', 2)->rules('required');
+                $row->text('row11', 1);
+            });
+        });
 
         $form->divide();
         /*************************************/

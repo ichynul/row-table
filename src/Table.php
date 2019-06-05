@@ -79,7 +79,7 @@ class Table extends Field
         $func =  array_get($arguments, 0, null);
 
         if ($func && $func instanceof Closure) {
-            
+
             call_user_func($func, $this);
         }
     }
@@ -175,7 +175,9 @@ class Table extends Field
             throw new \Exception('Rows format error!');
         }
 
-        $this->rows = $rows instanceof TableRow ? [$rows] : $rows;
+        $rows = $rows instanceof TableRow ? [$rows] : $rows;
+
+        $this->rows = array_merge($this->rows, $rows);
 
         $formatId = '';
 
@@ -371,6 +373,10 @@ class Table extends Field
      */
     protected function buildRows()
     {
+        if (!$this->id) {
+            $this->setRows();
+        }
+
         foreach ($this->rows as $row) {
 
             foreach ($row->geFields() as $field) {
@@ -390,6 +396,20 @@ class Table extends Field
         }
 
         $this->fromTable->setRows($this->rows);
+    }
+
+    /**
+     * Create a row
+     *
+     * @return void
+     */
+    public function row(Closure $callback)
+    {
+        $tableRow = new TableRow();
+
+        call_user_func($callback, $tableRow);
+
+        $this->rows[] = $tableRow;
     }
 
     /**
