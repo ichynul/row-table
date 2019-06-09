@@ -5,12 +5,11 @@ namespace Ichynul\RowTable;
 use Closure;
 use Encore\Admin\Form;
 use Encore\Admin\Form\Field;
+use Ichynul\RowTable\Field\Collect;
+use Ichynul\RowTable\Field\CollectValidator;
 use Ichynul\RowTable\Field\Show;
-use Illuminate\Validation\Validator;
-use Encore\Admin\Form\Field\MultipleSelect;
-use Illuminate\Support\Facades\Validator as ValidatorTool;
 
-class Table extends Field
+class Table extends Field implements Collect
 {
     /**
      * @var array
@@ -46,26 +45,6 @@ class Table extends Field
      */
     protected $rows = [];
 
-    /**
-     * @var array
-     */
-    protected $allRules = [];
-
-    /**
-     * @var array
-     */
-    protected $messages = [];
-
-    /**
-     * @var array
-     */
-    protected $labels = [];
-
-    /**
-     * @var array
-     */
-    protected $input = [];
-
     public function __construct($label, $arguments = [])
     {
         $this->label = $label;
@@ -76,12 +55,17 @@ class Table extends Field
 
         $this->fromTable->class($this->defaultClass);
 
-        $func =  array_get($arguments, 0, null);
+        $func = array_get($arguments, 0, null);
 
         if ($func && $func instanceof Closure) {
 
             call_user_func($func, $this);
         }
+    }
+
+    public function isCollect()
+    {
+        return true;
     }
 
     /**
@@ -252,100 +236,47 @@ class Table extends Field
      */
     public function getValidator(array $input)
     {
-        if ($this->validator) {
-            return $this->validator->call($this, $input);
-        }
-        $this->input = $input;
+        return $this->validatFields($input);
+    }
 
-        $this->allRules = [];
-
-        $this->messages = [];
-
-        $this->labels = [];
+    /**
+     * Get validator form fields.
+     *
+     * @param [type] $input
+     * @return void
+     */
+    public function validatFields($input)
+    {
+        $collectValidator = new CollectValidator;
 
         foreach ($this->rows as $row) {
 
             foreach ($row->geFields() as $field) {
 
-                if (!$validator = $field->getValidator($this->input)) {
-                    continue;
-                }
-
-                if (($validator instanceof Validator) && !$validator->passes()) {
-                    $this->makeValidator($field, $validator);
-                }
+                $collectValidator->pushField($field);
             }
         }
 
-        if (empty($this->allRules)) {
-            return false;
-        }
-
-        $this->allRules[$this->getErrorKey()] = ['required'];
-
-        $this->messages[$this->getErrorKey() . '.required'] = implode(' ', array_values($this->messages));
-
-        $this->labels[$this->getErrorKey()] = $this->label();
-
-        return ValidatorTool::make($this->input, $this->allRules, $this->messages, $this->labels);
-    }
-
-    protected function makeValidator($field, $validator)
-    {
-        $err = $validator->errors()->first($field->getErrorKey());
-
-        $column = $field->column();
-
-        if (is_string($column)) {
-
-            if (!array_has($this->input, $column)) {
-                return;
-            }
-
-            $this->input = $this->sanitizeFieldInput($field, $this->input, $column);
-
-            $this->allRules[$field->getErrorKey()] = ['required'];
-
-            $this->messages[$field->getErrorKey() . '.required'] = $err;
-
-            $this->labels[$field->getErrorKey()] = $field->label();
-        } else if (is_array($column)) {
-
-            foreach ($column as $key => $col) {
-
-                if (!array_key_exists($col, $this->input)) {
-                    return;
-                }
-
-                $this->input[$column . $key] = array_get($this->input, $column);
-
-                $this->allRules[$column . $key] =  ['required'];
-
-                $this->messages[] = [$field->getErrorKey() . '.required' => $err];
-
-                $this->labels[$column . $key] = $this->label . "[$column]";
-            }
-        }
+        return $collectValidator->validationMessages($input, $this->getErrorKey());
     }
 
     /**
-     * Sanitize input data.
-     * @param array  $field
-     * @param array  $input
-     * @param string $column
+     * Get fields of this.
      *
      * @return array
      */
-    protected function sanitizeFieldInput($field, $input, $column)
+    public function getFields()
     {
-        if ($field instanceof MultipleSelect) {
+        $fields = [];
 
-            $value = array_get($input, $column);
+        foreach ($this->rows as $row) {
 
-            array_set($input, $column, array_filter($value));
+            foreach ($row->geFields() as $field) {
+                $fields[] = $field;
+            }
         }
 
-        return $input;
+        return $fields;
     }
 
     /**
@@ -357,10 +288,20 @@ class Table extends Field
      */
     public function fill($data)
     {
+        $this->fillFields($data);
+    }
+
+    /**
+     * Fill data to the fields.
+     *
+     * @param [type] $data
+     * @return void
+     */
+    public function fillFields($data)
+    {
         foreach ($this->rows as $row) {
 
             foreach ($row->geFields() as $field) {
-
                 $field->fill($data);
             }
         }
@@ -422,7 +363,7 @@ class Table extends Field
         $this->buildRows();
 
         $this->addVariables([
-            'table' => $this->fromTable->render()
+            'table' => $this->fromTable->render(),
         ]);
 
         return view($this->getView(), $this->variables());
