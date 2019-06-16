@@ -15,9 +15,9 @@
          *
          * $tableRow-element($column, $label, $colspan); // table 时 colspan="{$colspan}"
          *
-         * $tableRow-show($html, $label, $width)->Textalign($align);  //div时 [useDiv(true)] class="col-sm-{$width}"
+         * $tableRow-show($html, $label, $width)->textAlign($align);  //div时 [useDiv(true)] class="col-sm-{$width}"
          *
-         * $tableRow-show($html, $label , $colspan)->Textalign($align)->textWidth($textWidth);  //table 时  colspan="{$colspan}";
+         * $tableRow-show($html, $label , $colspan)->textAlign($align)->textWidth($textWidth);  //table 时  colspan="{$colspan}";
          *
          * $tableRow-show($html, $label , $width)->addStyle('text-align', $align)->addStyle('width',$textWidth)->addStyle('anystyle','anyvalue');
          */
@@ -26,7 +26,7 @@
 
         $form->text('somerow', '混合使用form')->rules('required');
 
-       //$form->show("<h3>************Demo 1 , 使用 table************</h3>")->textWidth('100%')->Textalign('center');
+       //$form->show("<h3>************Demo 1 , 使用 table************</h3>")->textWidth('100%')->textAlign('center');
         // equals
         $form->show("<h3>************Demo 1 , 使用 table************</h3>")->addStyle('width', '100%')->addStyle('text-align', 'center');
 
@@ -72,7 +72,7 @@
 
         /*************************************/
 
-        $form->show("<h3>************Demo 2 , 使用 div************</h3>")->textWidth('100%')->Textalign('center')->addStyle('color', 'red');
+        $form->show("<h3>************Demo 2 , 使用 div************</h3>")->textWidth('100%')->textAlign('center')->addStyle('color', 'red');
 
         $form->icon('somerow2', '中间混合使用form')->rules('required');
 
@@ -105,7 +105,7 @@
         }
 
         /*************************************/
-        $form->show("<h3>************Demo 3 , use div build a user center ************</h3>")->textWidth('100%')->Textalign('center');
+        $form->show("<h3>************Demo 3 , use div build a user center ************</h3>")->textWidth('100%')->textAlign('center');
 
         $userRow = new TableRow();
         $userRow->image('photo', '头像', 6)->value('/vendor/laravel-admin/AdminLTE/dist/img/default-50x50.gif')->removeable();
@@ -127,25 +127,25 @@
 
         $form->divide();
         /*************************************/
-        $form->show("<h3>************Demo 4 , use table build a user center ************</h3>")->textWidth('100%')->Textalign('center');
+        $form->show("<h3>************Demo 4 , use table build a user center ************</h3>")->textWidth('100%')->textAlign('center');
 
         //这个比较麻烦,仅作为演示
         /*********************/
 
         $form->rowtable('Using colspan', function ($table) {
             $table->row(function ($row) {
-                $row->show('头像')->Textalign('left');
-                $row->show('个性签名')->Textalign('left');
+                $row->show('头像')->textAlign('left');
+                $row->show('个性签名')->textAlign('left');
             });
 
             $table->row(function ($row) {
                 $row->image('photo')->default('/vendor/laravel-admin/AdminLTE/dist/img/default-50x50.gif');
-                $row->show('<span class="label label-info">没个性也签名~</span>')->Textalign('left');
+                $row->show('<span class="label label-info">没个性也签名~</span>')->textAlign('left');
             });
 
             $table->row(function ($row) {
-                $row->show('姓名')->Textalign('left')->addStyle('color', 'red');
-                $row->show('性别')->Textalign('left')->addStyle('color', 'blue')->addStyle('font-size', '18px'); // add styles
+                $row->show('姓名')->textAlign('left')->addStyle('color', 'red');
+                $row->show('性别')->textAlign('left')->addStyle('color', 'blue')->addStyle('font-size', '18px'); // add styles
             });
 
             $table->row(function ($row) {
@@ -154,8 +154,8 @@
             });
 
             $table->row(function ($row) {
-                $row->show('年龄')->Textalign('left')->addStyle('color', 'red');
-                $row->show('生日')->Textalign('left');
+                $row->show('年龄')->textAlign('left')->addStyle('color', 'red');
+                $row->show('生日')->textAlign('left');
             });
 
             $table->row(function ($row) {
@@ -164,7 +164,7 @@
             });
 
             $table->row(function ($row) {
-                $row->show('个人简介', 2)->Textalign('left'); // colspan=2
+                $row->show('个人简介', 2)->textAlign('left'); // colspan=2
             });
 
             $table->row(function ($row) {
@@ -174,7 +174,7 @@
 
         $form->divide();
         /*************************************/
-        $form->show("<h3>************Demo 5 , table colspan, ************</h3>")->textWidth('100%')->Textalign('center');
+        $form->show("<h3>************Demo 5 , table colspan, ************</h3>")->textWidth('100%')->textAlign('center');
 
         $form->rowtable('Using colspan', function ($table) {
             $table->row(function ($row) {

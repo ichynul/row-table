@@ -63,11 +63,6 @@ class Table extends Field implements Collect
         }
     }
 
-    public function isCollect()
-    {
-        return true;
-    }
-
     /**
      * Call submitted callback.
      *
@@ -179,9 +174,7 @@ class Table extends Field implements Collect
             $row->bindRows();
         }
 
-        if (strlen($formatId) > 20) {
-            $formatId = substr($formatId, 20);
-        }
+        $formatId = md5($formatId);
 
         $this->setErrorKey($formatId);
 

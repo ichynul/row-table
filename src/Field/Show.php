@@ -23,13 +23,13 @@ class Show extends Field
      */
     protected $styles = [];
 
-    /**
+     /**
      * set text-align
      *
      * @param [strign] $align
      * @return $this
      */
-    public function Textalign($align)
+    public function textAlign($align)
     {
         $this->addStyle('text-align', $align);
 
