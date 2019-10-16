@@ -67,17 +67,17 @@ protected function form()
 
         // 另外一种代码风格 Another code style
          $form->rowtable('任务信息2', function ($table) {
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->text('text1', 'label1')->rules('required');
                 $row->text('text2', 'label2');
                 $row->text('text3', 'label3');
             });
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->text('text4', 'label4');
                 $row->text('text5', 'label5');
                 $row->text('text6', 'label6');
             });
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->text('text7', 'label7');
                 $row->text('text8', 'label8');
                 $row->text('text9', 'label9');

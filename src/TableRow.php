@@ -5,6 +5,58 @@ namespace Ichynul\RowTable;
 use Encore\Admin\Form;
 use Encore\Admin\Form\Field;
 
+/**
+ * Class TableRow.
+ * 
+ * Copy from from Encore\Admin\Form;
+ * 
+ * @method Field\Text           text($column, $label = '', $colspan = 1)
+ * @method Field\Checkbox       checkbox($column, $label = '', $colspan = 1)
+ * @method Field\Radio          radio($column, $label = '', $colspan = 1)
+ * @method Field\Select         select($column, $label = '', $colspan = 1)
+ * @method Field\MultipleSelect multipleSelect($column, $label = '', $colspan = 1)
+ * @method Field\Textarea       textarea($column, $label = '', $colspan = 1)
+ * @method Field\Hidden         hidden($column, $label = '', $colspan = 1)
+ * @method Field\Id             id($column, $label = '', $colspan = 1)
+ * @method Field\Ip             ip($column, $label = '', $colspan = 1)
+ * @method Field\Url            url($column, $label = '', $colspan = 1)
+ * @method Field\Color          color($column, $label = '', $colspan = 1)
+ * @method Field\Email          email($column, $label = '', $colspan = 1)
+ * @method Field\Mobile         mobile($column, $label = '', $colspan = 1)
+ * @method Field\Slider         slider($column, $label = '', $colspan = 1)
+ * @method Field\File           file($column, $label = '', $colspan = 1)
+ * @method Field\Image          image($column, $label = '', $colspan = 1)
+ * @method Field\Date           date($column, $label = '', $colspan = 1)
+ * @method Field\Datetime       datetime($column, $label = '', $colspan = 1)
+ * @method Field\Time           time($column, $label = '', $colspan = 1)
+ * @method Field\Year           year($column, $label = '', $colspan = 1)
+ * @method Field\Month          month($column, $label = '', $colspan = 1)
+ * @method Field\DateRange      dateRange($start, $end, $label = '', $colspan = 1)
+ * @method Field\DateTimeRange  datetimeRange($start, $end, $label = '', $colspan = 1)
+ * @method Field\TimeRange      timeRange($start, $end, $label = '', $colspan = 1)
+ * @method Field\Number         number($column, $label = '', $colspan = 1)
+ * @method Field\Currency       currency($column, $label = '', $colspan = 1)
+ * @method Field\HasMany        hasMany($relationName, $label = '', $callback)
+ * @method Field\SwitchField    switch($column, $label = '', $colspan = 1)
+ * @method Field\Display        display($column, $label = '', $colspan = 1)
+ * @method Field\Rate           rate($column, $label = '', $colspan = 1)
+ * @method Field\Divider        divider($title = '')
+ * @method Field\Password       password($column, $label = '', $colspan = 1)
+ * @method Field\Decimal        decimal($column, $label = '', $colspan = 1)
+ * @method Field\Html           html($html, $label = '', $colspan = 1)
+ * @method Field\Tags           tags($column, $label = '', $colspan = 1)
+ * @method Field\Icon           icon($column, $label = '', $colspan = 1)
+ * @method Field\Embeds         embeds($column, $label = '', $callback)
+ * @method Field\MultipleImage  multipleImage($column, $label = '', $colspan = 1)
+ * @method Field\MultipleFile   multipleFile($column, $label = '', $colspan = 1)
+ * @method Field\Captcha        captcha($column, $label = '', $colspan = 1)
+ * @method Field\Listbox        listbox($column, $label = '', $colspan = 1)
+ * @method Field\Table          table($column, $label, $builder)
+ * @method Field\Timezone       timezone($column, $label = '', $colspan = 1)
+ * @method Field\KeyValue       keyValue($column, $label = '', $colspan = 1)
+ * @method Field\ListField      list($column, $label = '', $colspan = 1)
+ */
+
 class TableRow
 {
     /**
@@ -44,7 +96,7 @@ class TableRow
      */
     public function pushField(Field $field, $colspan = 1)
     {
-        $field->column();
+        $column = $this->columnStr($field->column());
 
         $label = $field->label();
 
@@ -57,7 +109,7 @@ class TableRow
 
         $this->fields[] = $field;
 
-        $this->col_spans[$field->column()] = is_numeric($colspan) ? $colspan : 1;
+        $this->col_spans[$column] = is_numeric($colspan) ? $colspan : 1;
 
         return $this;
     }
@@ -73,7 +125,7 @@ class TableRow
     }
 
     /**
-     * Auto set Width 
+     * Auto set Width
      * @return $this
      */
     public function autoSpan()
@@ -102,24 +154,26 @@ class TableRow
 
             foreach ($this->fields as $field) {
 
+                $column = $this->columnStr($field->column());
+
                 if ($rows >= 4) {
 
-                    $this->col_spans[$field->column()] = 3;
+                    $this->col_spans[$column] = 3;
 
                     $field->setWidth(6, 6);
                 } else if ($rows == 3) {
 
-                    $this->col_spans[$field->column()] = 4;
+                    $this->col_spans[$column] = 4;
 
                     $field->setWidth(8, 4);
                 } else if ($rows == 2) {
 
-                    $this->col_spans[$field->column()] = 6;
+                    $this->col_spans[$column] = 6;
 
                     $field->setWidth(8, 2);
                 } else {
 
-                    $this->col_spans[$field->column()] = 12;
+                    $this->col_spans[$column] = 12;
 
                     $field->setWidth(10, 2);
                 }
@@ -134,21 +188,23 @@ class TableRow
      *
      * @return int
      */
-    public function getSpan($column)
+    public function getSpan($columns)
     {
+        $columns = $this->columnStr($columns);
+
         if (empty($this->col_spans)) {
             return 1;
         }
 
-        if (!array_key_exists($column, $this->col_spans)) {
+        if (!array_key_exists($columns, $this->col_spans)) {
             return 1;
         }
 
-        return $this->col_spans[$column] ?: 1;
+        return $this->col_spans[$columns] ?: 1;
     }
 
     /**
-     * set col_spans 
+     * set col_spans
      *
      * @return $this
      */
@@ -159,7 +215,7 @@ class TableRow
     }
 
     /**
-     * set table 
+     * set table
      *
      * @return $this
      */
@@ -167,6 +223,24 @@ class TableRow
     {
         $this->table = $table;
         return $this;
+    }
+
+    /**
+     * get column as string
+     *
+     * @param string|array $columns
+     * @return string
+     */
+    public function columnStr($columns)
+    {
+        $key = $columns;
+
+        if (is_array($columns)) { //Elements has more than 2 arguments : [dateRange / datetimeRange / latlong] , they column is array;
+
+            $key = implode('_', array_values($columns));
+        }
+
+        return $key;
     }
 
     /**
@@ -185,15 +259,30 @@ class TableRow
 
             $arguments = array_slice($arguments, 1);
 
-            $label = array_get($arguments, 0, '');
+            $count = count($arguments);
 
-            $element = new $className($column, [is_numeric($label) ? $column : $label]);
+            $colspan = 1;
+
+            if ($count > 0) {
+                // $form->text($column, $label); Most of the elements has 2 arguments;
+                // $form->dateRange($startDate, $endDate, $label); //Elements has more than 2 arguments : [dateRange / datetimeRange / latlong];
+
+                // last of arguments is label
+                $label = $arguments[$count - 1];
+
+                if (is_numeric($label)) { // if the last is number
+
+                    //Exemple:
+                    // $form->text($column, $label, 2);  // 2 is colspan
+                    // $form->dateRange($startDate, $endDate, $label, 2);
+
+                    $colspan = intval($label);
+                }
+            }
+
+            $element = new $className($column, $arguments);
 
             if (!$this->bind_rows) {
-
-                $colspan = count($arguments) > 1 ? array_get($arguments, 1, 1) : array_get($arguments, 0, 1);
-
-                $colspan = is_numeric($colspan) ? $colspan : 1;
 
                 $element->setWidth(8, 4);
 

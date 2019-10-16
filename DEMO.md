@@ -133,41 +133,41 @@
         /*********************/
 
         $form->rowtable('Using colspan', function ($table) {
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->show('头像')->textAlign('left');
                 $row->show('个性签名')->textAlign('left');
             });
 
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->image('photo')->default('/vendor/laravel-admin/AdminLTE/dist/img/default-50x50.gif');
                 $row->show('<span class="label label-info">没个性也签名~</span>')->textAlign('left');
             });
 
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->show('姓名')->textAlign('left')->addStyle('color', 'red');
                 $row->show('性别')->textAlign('left')->addStyle('color', 'blue')->addStyle('font-size', '18px'); // add styles
             });
 
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->text('name');
                 $row->radio('gender')->options(['0' => '保密', '1' => '男', '2' => '女']);
             });
 
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->show('年龄')->textAlign('left')->addStyle('color', 'red');
                 $row->show('生日')->textAlign('left');
             });
 
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->number('age', '年龄')->max(99)->min(18);
                 $row->date('birthday', '生日');
             });
 
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->show('个人简介', 2)->textAlign('left'); // colspan=2
             });
 
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->textarea('about', 2); // colspan=2
             });
         });
@@ -177,25 +177,25 @@
         $form->show("<h3>************Demo 5 , table colspan, ************</h3>")->textWidth('100%')->textAlign('center');
 
         $form->rowtable('Using colspan', function ($table) {
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->text('row1'); //defautt 1
                 $row->text('row2');
                 $row->text('row3')->rules('required');
                 $row->text('row4');
             });
 
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->text('row5', 2);
                 $row->text('row6', 2);
             });
 
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->text('row7', 2);
                 $row->text('row8'); //defautt 1
                 $row->text('row8', 1)->rules('required');
             });
 
-            $table->row(function ($row) {
+            $table->row(function (TableRow $row) {
                 $row->text('row9', 1);
                 $row->text('row10', 2)->rules('required');
                 $row->text('row11', 1);
