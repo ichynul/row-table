@@ -8,7 +8,7 @@ use Encore\Admin\Form\Field;
 /**
  * Class TableRow.
  * 
- * Copy from from Encore\Admin\Form;
+ * Copy from Encore\Admin\Form;
  * 
  * @method Field\Text           text($column, $label = '', $colspan = 1)
  * @method Field\Checkbox       checkbox($column, $label = '', $colspan = 1)
