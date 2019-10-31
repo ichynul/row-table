@@ -3,6 +3,7 @@
 namespace Ichynul\RowTable\Field;
 
 use Encore\Admin\Form\Field;
+use Illuminate\Support\Arr;
 
 class Show extends Field
 {
@@ -72,7 +73,7 @@ class Show extends Field
     {
         $this->html = $html;
 
-        $this->width['field']  = array_get($arguments, 0, 12);
+        $this->width['field']  = Arr::get($arguments, 0, 12);
 
         $this->addStyle('width', 'auto');
 

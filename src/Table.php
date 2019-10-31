@@ -8,6 +8,7 @@ use Encore\Admin\Form\Field;
 use Ichynul\RowTable\Field\Collect;
 use Ichynul\RowTable\Field\CollectValidator;
 use Ichynul\RowTable\Field\Show;
+use Illuminate\Support\Arr;
 
 class Table extends Field implements Collect
 {
@@ -55,7 +56,7 @@ class Table extends Field implements Collect
 
         $this->fromTable->class($this->defaultClass);
 
-        $func = array_get($arguments, 0, null);
+        $func = Arr::get($arguments, 0, null);
 
         if ($func && $func instanceof Closure) {
 

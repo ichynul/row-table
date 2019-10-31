@@ -4,6 +4,7 @@ namespace Ichynul\RowTable;
 
 use Encore\Admin\Form;
 use Encore\Admin\Form\Field;
+use Illuminate\Support\Arr;
 
 /**
  * Class TableRow.
@@ -255,7 +256,7 @@ class TableRow
     {
         if ($className = Form::findFieldClass($method)) {
 
-            $column = array_get($arguments, 0, '');
+            $column = Arr::get($arguments, 0, '');
 
             $arguments = array_slice($arguments, 1);
 

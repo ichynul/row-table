@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\Validator;
 use Illuminate\Support\Facades\Validator as ValidatorTool;
+use Illuminate\Support\Arr;
 
 class CollectValidator
 {
@@ -79,7 +80,7 @@ class CollectValidator
 
                 $err = $validator->errors()->first($field->getErrorKey());
 
-                $rules[$field->getErrorKey()] = array_get($validator->getRules(), $field->getErrorKey());
+                $rules[$field->getErrorKey()] = Arr::get($validator->getRules(), $field->getErrorKey());
 
                 $messages[$field->getErrorKey() . '.required'] = $err;
 
