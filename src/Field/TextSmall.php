@@ -9,16 +9,6 @@ class TextSmall extends Field
 {
     use PlainInput;
 
-    /**
-     * Get placeholder.
-     *
-     * @return string
-     */
-    public function getPlaceholder()
-    {
-        return $this->label;
-    }
-
      /**
      * Render this filed.
      *
