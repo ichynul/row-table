@@ -82,7 +82,7 @@ class Show extends Field
         $this->addStyle('min-width', '70px');
     }
 
-    public function variables()
+    public function variables(): array
     {
         return array_merge($this->variables, [
             'help'        => $this->help,
