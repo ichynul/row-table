@@ -169,7 +169,9 @@ class Table extends Field implements Collect
 
                 $field->setForm($this->form);
 
-                $formatId .= $this->formatId($field->column());
+                $column = $row->columnStr($field->column());
+
+                $formatId .= $column;
             }
 
             $row->bindRows();
