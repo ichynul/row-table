@@ -288,6 +288,23 @@ class Table extends Field implements Collect
     }
 
     /**
+     * Set original value to the field.
+     *
+     * @param array $data
+     *
+     * @return void
+     */
+    public function setOriginal($data)
+    {
+        foreach ($this->rows as $row) {
+
+            foreach ($row->geFields() as $field) {
+                $field->setOriginal($data);
+            }
+        }
+    }
+
+    /**
      * Fill data to the fields.
      *
      * @param [type] $data
