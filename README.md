@@ -15,25 +15,9 @@ $ php artisan vendor:publish --tag=row-table
 
 ```
 
-## Update it
-
-After `composer update` , if version of this extension changed :
-
-Run
-
-```
-php artisan vendor:publish --tag=row-table --force
-```
-
-This will override css and js fiels to `/public/vendor/laravel-admin-ext/row-table/`
-
-Or you can and a script in `composer.json` :
-
-```json
-"scripts": {
-    "post-update-cmd": "php artisan vendor:publish --tag=row-table --force",
-}
-```
+##### 
+##### 推荐使用 $field->setGroupClass('col-md-6');//这样的方式来实现栅格布局，毕竟官方的兼容性更好一些。
+##### It is recommended to use $field->setgroupclass('col-md-6'); // this official way to achieve grid layout.
 
 ## Usage
 
