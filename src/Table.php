@@ -30,11 +30,6 @@ class Table extends Field implements Collect
     protected $view = 'row-table::table';
 
     /**
-     * @var Form
-     */
-    protected $form = null;
-
-    /**
      * class attr
      *
      * @var string
@@ -135,7 +130,14 @@ class Table extends Field implements Collect
 
     public function setForm(Form $form = null)
     {
-        $this->form = $form;
+        parent::setForm($form);
+        
+        foreach ($this->rows as $row) {
+
+            foreach ($row->geFields() as $field) {
+                $field->setForm($form);
+            }
+        }
 
         $this->bindSubmitted();
 
