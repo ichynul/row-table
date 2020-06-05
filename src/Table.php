@@ -4,6 +4,7 @@ namespace Ichynul\RowTable;
 
 use Closure;
 use Encore\Admin\Form;
+use Encore\Admin\Widgets\Form as WidgetForm;
 use Encore\Admin\Form\Field;
 use Ichynul\RowTable\Field\Collect;
 use Ichynul\RowTable\Field\CollectValidator;
@@ -140,6 +141,27 @@ class Table extends Field implements Collect
         }
 
         $this->bindSubmitted();
+
+        return $this;
+    }
+    
+    /**
+     * Set Widget/Form as field parent.
+     *
+     * @param WidgetForm $form
+     *
+     * @return $this
+     */
+    public function setWidgetForm(WidgetForm $form)
+    {
+        parent::setWidgetForm($form);
+        
+        foreach ($this->rows as $row) {
+
+            foreach ($row->geFields() as $field) {
+                $field->setWidgetForm($form);
+            }
+        }
 
         return $this;
     }
