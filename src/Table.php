@@ -191,7 +191,13 @@ class Table extends Field implements Collect
 
             foreach ($row->geFields() as $field) {
 
-                $field->setForm($this->form);
+                if ($this->form instanceof WidgetForm) {
+
+                    $field->setWidgetForm($this->form);
+                } else {
+                    
+                    $field->setForm($this->form);
+                }
 
                 $column = $row->columnStr($field->column());
 
